@@ -9,13 +9,14 @@ import (
 )
 
 func main() {
-	var a [32][4]bool
 	browser := rod.New().MustConnect()
 	basepage := browser.MustPage("https://developer.android.com/courses/android-basics-compose/course")
 
 	pathways := basepage.MustWaitStable().MustElements(".compose-pathway-link")
 
 	for _, pathway := range pathways {
+		var a [32][4]bool
+
 		page := browser.MustPage(pathway.MustProperty("href").String())
 
 		page.MustElement("div.devsite-playlist--item--actions:nth-child(3) > a:nth-child(1)").MustClick()
