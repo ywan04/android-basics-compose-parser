@@ -29,7 +29,7 @@ type TestData struct {
 }
 
 func main() {
-	//var testData TestData
+	var testData TestData
 
 	browser := rod.New().MustConnect()
 	basepage := browser.MustPage("https://developer.android.com/courses/android-basics-compose/course")
@@ -38,14 +38,9 @@ func main() {
 
 	// обробка усіх pathway
 	for _, pathway := range pathways {
-		var a [32][4]bool
-
 		page := browser.MustPage(pathway.MustProperty("href").String())
 
 		page.MustElement("div.devsite-playlist--item--actions:nth-child(3) > a:nth-child(1)").MustClick()
-
-		//nofquests := len(page.MustWaitStable().MustElements("devsite-quiz-question"))
-		//fmt.Println(nofquests)
 
 		// вибір певного варіанту та перевірка його на правильність
 		for i := 0; i < 4; i++ {
