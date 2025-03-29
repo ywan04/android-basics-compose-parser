@@ -5,8 +5,28 @@ import (
 	"strconv"
 	"time"
 
+	"encoding/json"
+
 	"github.com/go-rod/rod"
 )
+
+type TestData struct {
+	units []struct {
+		unitName string
+		pathways []struct {
+			pathwayName string
+			questions []struct {
+				questionTitle string
+				questionSubTitle string
+				questionType string
+				options []struct {
+					optionTitle string
+					correctness string
+				}
+			}
+		}
+	}
+}
 
 func main() {
 	browser := rod.New().MustConnect()
