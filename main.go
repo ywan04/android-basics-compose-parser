@@ -29,11 +29,14 @@ type TestData struct {
 }
 
 func main() {
+	//var testData TestData
+
 	browser := rod.New().MustConnect()
 	basepage := browser.MustPage("https://developer.android.com/courses/android-basics-compose/course")
 
 	pathways := basepage.MustWaitStable().MustElements(".compose-pathway-link")
 
+	// обробка усіх pathway
 	for _, pathway := range pathways {
 		var a [32][4]bool
 
@@ -44,6 +47,7 @@ func main() {
 		//nofquests := len(page.MustWaitStable().MustElements("devsite-quiz-question"))
 		//fmt.Println(nofquests)
 
+		// вибір певного варіанту та перевірка його на правильність
 		for i := 0; i < 4; i++ {
 			bs := page.MustWaitStable().MustElements("input[value='" + strconv.Itoa(i) + "']");
 			for _, b := range bs {
@@ -60,6 +64,7 @@ func main() {
 			page.MustElement("button.button").MustClick()
 		}
 
+		// виведення правильних відповідей
 		for i := 0; i < 10; i++ {
 			fmt.Printf("%2d:\n", i+1)
 			for j := 0; j < 4; j++ {
