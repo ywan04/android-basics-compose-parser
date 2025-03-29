@@ -38,14 +38,34 @@ func main() {
 
 	// обробка усіх pathway
 	for _, pathway := range pathways {
-		page := browser.MustPage(pathway.MustProperty("href").String())
+		pathwayLink = pathway.MustProperty("href").String()
 
+		var unitNum int
+		var pathwayNum int
+		fmt.Sscanf(pathwayLink, "/courses/pathways/android-basics-compose-unit-%d-pathway-%d", &unitNum, &pathwayNum)
+		// TODO: add this data to structure
+
+		page := browser.MustPage(pathwayLink)
 		page.MustElement("div.devsite-playlist--item--actions:nth-child(3) > a:nth-child(1)").MustClick()
 
+		qs := page.MustWaitStable().MustElements("devsite-quiz-question")
+		for _, q := range qs {
+			qNum := q.MustProperty("data-index")
+			qTitle := q.MustElement("h2").MustText()
+			qSubTitle := q.MustElement("p").MustText()
+		}
+		// TODO: add this data to structure
+
 		// вибір певного варіанту та перевірка його на правильність
+		// TODO: вирахувати макс кількість питань
 		for i := 0; i < 4; i++ {
 			bs := page.MustWaitStable().MustElements("input[value='" + strconv.Itoa(i) + "']");
 			for _, b := range bs {
+				var nq, nans int
+				fmt.Sscanf(cb.MustProperty("name").String(), "question-%d", &nq)
+				fmt.Sscanf(cb.MustProperty("value").String(), "%d",  &nans)
+				// TODO: add this data to structure
+
 				b.MustClick()
 			}
 			page.MustElement("button.button-primary").MustClick()
@@ -54,17 +74,9 @@ func main() {
 				var nq, nans int
 				fmt.Sscanf(cb.MustProperty("name").String(), "question-%d", &nq)
 				fmt.Sscanf(cb.MustProperty("value").String(), "%d",  &nans)
-				a[nq][nans] = true
+				// TODO: add this data to structure
 			}
 			page.MustElement("button.button").MustClick()
-		}
-
-		// виведення правильних відповідей
-		for i := 0; i < 10; i++ {
-			fmt.Printf("%2d:\n", i+1)
-			for j := 0; j < 4; j++ {
-				fmt.Printf("  - %t\n", a[i][j])
-			}
 		}
 
 		page.Close()
