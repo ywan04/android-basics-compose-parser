@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"strconv"
-	"time"
+	//"time"
 
 	//"encoding/json"
 
@@ -11,29 +11,29 @@ import (
 )
 
 type TestData struct {
-	units []Unit
+	Units []Unit `json: "units"`
 }
 
 type Unit struct {
-	unitName string
-	pathways []Pathway
+	UnitName string `json: "unitName"`
+	Pathways []Pathway `json: "pathways"` 
 }
 
 type Pathway struct {
-	pathwayName string
-	questions []Question
+	PathwayName string `json: "pathwayName"` 
+	Questions []Question `json: "questions"` 
 }
 
 type Question struct {
-	questionTitle string
-	questionSubTitle string
-	questionType string
-	options []Option
+	QuestionTitle string `json: "questionTitle"` 
+	QuestionSubTitle string `json: "questionSubTitle"` 
+	QuestionType string `json: "questionType"` 
+	Options []Option `json: "options"` 
 }
 
 type Option struct {
-	optionTitle string
-	correctness string
+	OptionTitle string `json: "optionTitle"` 
+	Correctness string `json: "correctness"`
 }
 
 func main() {
@@ -52,37 +52,44 @@ func main() {
 		var pathwayNum int
 		fmt.Sscanf(pathwayLink, "/courses/pathways/android-basics-compose-unit-%d-pathway-%d", &unitNum, &pathwayNum)
 		// TODO: add this data to structure
-		testData.units = append(testData.units, Unit{})
-		curUnit := &testData.units[len(testData.units)-1]
-		curUnit.unitName = "TodoUnitName"
-		curUnit.pathways = append(curUnit.pathways, Pathway{})
-		curPathway := &curUnit.pathways[len(curUnit.pathways)-1]
-		curPathway.pathwayName = "TodoPathwayName"
+		testData.Units = append(testData.Units, Unit{})
+		curUnit := &testData.Units[len(testData.Units)-1]
+		curUnit.UnitName = "TodoUnitName"
+		curUnit.Pathways = append(curUnit.Pathways, Pathway{})
+		curPathway := &curUnit.Pathways[len(curUnit.Pathways)-1]
+		curPathway.PathwayName = "TodoPathwayName"
 
 		page := browser.MustPage(pathwayLink)
 		page.MustElement("div.devsite-playlist--item--actions:nth-child(3) > a:nth-child(1)").MustClick()
 
-		qs := page.MustWaitStable().MustElements("devsite-quiz-question")
-		for _, q := range qs {
-			curPathway.questions = append(curPathway.questions, Question{})
-			curQuestion := &curPathway.questions[len(curPathway.questions)-1]
+		qs := page.MustWaitStable().MustElements("li.devsite-quiz-question")
 
-			curQuestion.questionTitle = q.MustElement("h2").MustText()
-			curQuestion.questionSubTitle = q.MustElement("p").MustText()
-			curQuestion.questionType = "TODO"
-			fmt.Println(curQuestion.questionSubTitle)
+		for _, q := range qs {
+			curPathway.Questions = append(curPathway.Questions, Question{})
+			curQuestion := &curPathway.Questions[len(curPathway.Questions)-1]
+
+			curQuestion.QuestionTitle = q.MustElement("h2").MustText()
+			rawSubTitle := q.MustElements("p")
+			for _, st := range rawSubTitle {
+				curQuestion.QuestionSubTitle = st.MustText()
+			}
+			curQuestion.QuestionType = "TODO"
 		}
 		// TODO: add this data to structure
 
 		// вибір певного варіанту та перевірка його на правильність
 		// TODO: вирахувати макс кількість питань
-		for i := 0; i < 4; i++ {
+		for i := 0; i < 6; i++ {
 			bs := page.MustWaitStable().MustElements("input[value='" + strconv.Itoa(i) + "']");
 			for _, b := range bs {
 				var nq, nans int
+
 				fmt.Sscanf(b.MustProperty("name").String(), "question-%d", &nq)
 				fmt.Sscanf(b.MustProperty("value").String(), "%d",  &nans)
 				// TODO: add this data to structure
+				curPathway.Questions[nq].Options = append(curPathway.Questions[nq].Options, Option{})
+				curOption := curPathway.Questions[nq].Options[len(curPathway.Questions[nq].Options)-1]
+				curOption.OptionTitle = "TODO"
 
 				b.MustClick()
 			}
@@ -93,12 +100,20 @@ func main() {
 				fmt.Sscanf(cb.MustProperty("name").String(), "question-%d", &nq)
 				fmt.Sscanf(cb.MustProperty("value").String(), "%d",  &nans)
 				// TODO: add this data to structure
+				fmt.Println(nans)
+				curOption := curPathway.Questions[nq].Options[nans]
+				curOption.Correctness = "true"
+				fmt.Println(curPathway.Questions[nq].Options)
 			}
 			page.MustElement("button.button").MustClick()
 		}
 
 		page.Close()
+		break
 	}
 
-	time.Sleep(time.Hour)
+	fmt.Println(testData)
+	//data, _ := json.Marshal(testData)
+	//dataOutput := string(data)
+	//fmt.Println(dataOutput)
 }
