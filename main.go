@@ -5,7 +5,7 @@ import (
 	"strconv"
 	//"time"
 
-	//"encoding/json"
+	"encoding/json"
 
 	"github.com/go-rod/rod"
 )
@@ -50,14 +50,13 @@ func main() {
 
 		var unitNum int
 		var pathwayNum int
-		fmt.Sscanf(pathwayLink, "/courses/pathways/android-basics-compose-unit-%d-pathway-%d", &unitNum, &pathwayNum)
-		// TODO: add this data to structure
+		fmt.Sscanf(pathwayLink, "https://developer.android.com/courses/pathways/android-basics-compose-unit-%d-pathway-%d", &unitNum, &pathwayNum)
 		testData.Units = append(testData.Units, Unit{})
 		curUnit := &testData.Units[len(testData.Units)-1]
-		curUnit.UnitName = "TodoUnitName"
+		curUnit.UnitName = "Unit-" + fmt.Sprint(unitNum)
 		curUnit.Pathways = append(curUnit.Pathways, Pathway{})
 		curPathway := &curUnit.Pathways[len(curUnit.Pathways)-1]
-		curPathway.PathwayName = "TodoPathwayName"
+		curPathway.PathwayName = "Pathway-" + fmt.Sprint(pathwayNum)
 
 		page := browser.MustPage(pathwayLink)
 		page.MustElement("div.devsite-playlist--item--actions:nth-child(3) > a:nth-child(1)").MustClick()
@@ -73,12 +72,10 @@ func main() {
 			for _, st := range rawSubTitle {
 				curQuestion.QuestionSubTitle = st.MustText()
 			}
-			curQuestion.QuestionType = "TODO"
+			curQuestion.QuestionType = *q.MustAttribute("data-type")
 		}
-		// TODO: add this data to structure
 
 		// вибір певного варіанту та перевірка його на правильність
-		// TODO: вирахувати макс кількість питань
 		for i := 0; i < 6; i++ {
 			bs := page.MustWaitStable().MustElements("input[value='" + strconv.Itoa(i) + "']");
 			for _, b := range bs {
@@ -86,10 +83,10 @@ func main() {
 
 				fmt.Sscanf(b.MustProperty("name").String(), "question-%d", &nq)
 				fmt.Sscanf(b.MustProperty("value").String(), "%d",  &nans)
-				// TODO: add this data to structure
 				curPathway.Questions[nq].Options = append(curPathway.Questions[nq].Options, Option{})
 				curOption := &curPathway.Questions[nq].Options[len(curPathway.Questions[nq].Options)-1]
-				curOption.OptionTitle = "TODO"
+				ot := page.MustElement("label[for=\"" + b.MustProperty("id").String() + "\"]")
+				curOption.OptionTitle = ot.MustProperty("innerHTML").String()
 
 				b.MustClick()
 			}
@@ -99,7 +96,6 @@ func main() {
 				var nq, nans int
 				fmt.Sscanf(cb.MustProperty("name").String(), "question-%d", &nq)
 				fmt.Sscanf(cb.MustProperty("value").String(), "%d",  &nans)
-				// TODO: add this data to structure
 				curOption := &curPathway.Questions[nq].Options[nans]
 				curOption.Correctness = true
 			}
@@ -107,11 +103,10 @@ func main() {
 		}
 
 		page.Close()
-		break
+		break;
 	}
 
-	fmt.Println(testData)
-	//data, _ := json.Marshal(testData)
-	//dataOutput := string(data)
-	//fmt.Println(dataOutput)
+	data, _ := json.Marshal(testData)
+	dataOutput := string(data)
+	fmt.Println(dataOutput)
 }
