@@ -81,14 +81,13 @@ func main() {
 
 			if curQuestion.QuestionTitle == "Fill-in-the-blanks" {
 				curQuestion.Options = append(curQuestion.Options, Option{})
-				if curQuestion.QuestionSubTitle == "\u003cspan\u003e\n      To handle conflicts when inserting into a database, you can pass a(n) \u003c/span\u003e\u003cinput type=\"text\" name=\"question-6\" class=\"devsite-quiz-text-input\" placeholder=\"Fill in the blank...\"\u003e\u003cspan\u003e parameter, such as IGNORE, to the @Insert annotation.\n    \u003c/span\u003e" {
+				if curQuestion.QuestionSubTitle == "\n      To handle conflicts when inserting into a database, you can pass a(n) ___ parameter, such as \u003ccode translate=\"no\" dir=\"ltr\"\u003eIGNORE\u003c/code\u003e, to the \u003ccode translate=\"no\" dir=\"ltr\"\u003e@Insert\u003c/code\u003e annotation.\n    " {
 					curQuestion.Options[0].OptionTitle = "onConflict"
-					curQuestion.Options[0].Correctness = true
 				}
 				if curQuestion.QuestionSubTitle == "\n      The ___ thread is responsible for displaying the user interface responding to user input.\n    " {
 					curQuestion.Options[0].OptionTitle = "Main"
-					curQuestion.Options[0].Correctness = true
 				}
+				curQuestion.Options[0].Correctness = true
 			}
 		}
 
