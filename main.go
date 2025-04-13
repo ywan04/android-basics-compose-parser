@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strconv"
 	//"time"
+	"os"
 
 	"encoding/json"
 
@@ -38,6 +39,9 @@ type Option struct {
 
 func main() {
 	var testData TestData
+
+	file, _ := os.Create("quizData.json")
+	defer file.Close()
 
 	browser := rod.New().MustConnect()
 	basepage := browser.MustPage("https://developer.android.com/courses/android-basics-compose/course")
@@ -103,10 +107,9 @@ func main() {
 		}
 
 		page.Close()
-		break;
 	}
 
 	data, _ := json.Marshal(testData)
 	dataOutput := string(data)
-	fmt.Println(dataOutput)
+	fmt.Fprintf(file, dataOutput)
 }
