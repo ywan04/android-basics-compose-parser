@@ -33,7 +33,7 @@ type Question struct {
 
 type Option struct {
 	OptionTitle string `json: "optionTitle"` 
-	Correctness string `json: "correctness"`
+	Correctness bool `json: "correctness"`
 }
 
 func main() {
@@ -88,7 +88,7 @@ func main() {
 				fmt.Sscanf(b.MustProperty("value").String(), "%d",  &nans)
 				// TODO: add this data to structure
 				curPathway.Questions[nq].Options = append(curPathway.Questions[nq].Options, Option{})
-				curOption := curPathway.Questions[nq].Options[len(curPathway.Questions[nq].Options)-1]
+				curOption := &curPathway.Questions[nq].Options[len(curPathway.Questions[nq].Options)-1]
 				curOption.OptionTitle = "TODO"
 
 				b.MustClick()
@@ -100,10 +100,8 @@ func main() {
 				fmt.Sscanf(cb.MustProperty("name").String(), "question-%d", &nq)
 				fmt.Sscanf(cb.MustProperty("value").String(), "%d",  &nans)
 				// TODO: add this data to structure
-				fmt.Println(nans)
-				curOption := curPathway.Questions[nq].Options[nans]
-				curOption.Correctness = "true"
-				fmt.Println(curPathway.Questions[nq].Options)
+				curOption := &curPathway.Questions[nq].Options[nans]
+				curOption.Correctness = true
 			}
 			page.MustElement("button.button").MustClick()
 		}
