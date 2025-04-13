@@ -3,7 +3,8 @@ package main
 import (
 	"fmt"
 	"strconv"
-	"time"
+	//"time"
+	"os"
 
 	"encoding/json"
 
@@ -11,25 +12,36 @@ import (
 )
 
 type TestData struct {
-	units []struct {
-		unitName string
-		pathways []struct {
-			pathwayName string
-			questions []struct {
-				questionTitle string
-				questionSubTitle string
-				questionType string
-				options []struct {
-					optionTitle string
-					correctness string
-				}
-			}
-		}
-	}
+	Units []Unit `json: "units"`
+}
+
+type Unit struct {
+	UnitName string `json: "unitName"`
+	Pathways []Pathway `json: "pathways"` 
+}
+
+type Pathway struct {
+	PathwayName string `json: "pathwayName"` 
+	Questions []Question `json: "questions"` 
+}
+
+type Question struct {
+	QuestionTitle string `json: "questionTitle"` 
+	QuestionSubTitle string `json: "questionSubTitle"` 
+	QuestionType string `json: "questionType"` 
+	Options []Option `json: "options"` 
+}
+
+type Option struct {
+	OptionTitle string `json: "optionTitle"` 
+	Correctness bool `json: "correctness"`
 }
 
 func main() {
-	//var testData TestData
+	var testData TestData
+
+	file, _ := os.Create("quizData.json")
+	defer file.Close()
 
 	browser := rod.New().MustConnect()
 	basepage := browser.MustPage("https://developer.android.com/courses/android-basics-compose/course")
@@ -38,19 +50,48 @@ func main() {
 
 	// обробка усіх pathway
 	for _, pathway := range pathways {
-		var a [32][4]bool
+		pathwayLink := pathway.MustProperty("href").String()
 
-		page := browser.MustPage(pathway.MustProperty("href").String())
+		var unitNum int
+		var pathwayNum int
+		fmt.Sscanf(pathwayLink, "https://developer.android.com/courses/pathways/android-basics-compose-unit-%d-pathway-%d", &unitNum, &pathwayNum)
+		testData.Units = append(testData.Units, Unit{})
+		curUnit := &testData.Units[len(testData.Units)-1]
+		curUnit.UnitName = "Unit-" + fmt.Sprint(unitNum)
+		curUnit.Pathways = append(curUnit.Pathways, Pathway{})
+		curPathway := &curUnit.Pathways[len(curUnit.Pathways)-1]
+		curPathway.PathwayName = "Pathway-" + fmt.Sprint(pathwayNum)
 
+		page := browser.MustPage(pathwayLink)
 		page.MustElement("div.devsite-playlist--item--actions:nth-child(3) > a:nth-child(1)").MustClick()
 
-		//nofquests := len(page.MustWaitStable().MustElements("devsite-quiz-question"))
-		//fmt.Println(nofquests)
+		qs := page.MustWaitStable().MustElements("li.devsite-quiz-question")
+
+		for _, q := range qs {
+			curPathway.Questions = append(curPathway.Questions, Question{})
+			curQuestion := &curPathway.Questions[len(curPathway.Questions)-1]
+
+			curQuestion.QuestionTitle = q.MustElement("h2").MustText()
+			rawSubTitle := q.MustElements("p")
+			for _, st := range rawSubTitle {
+				curQuestion.QuestionSubTitle = st.MustText()
+			}
+			curQuestion.QuestionType = *q.MustAttribute("data-type")
+		}
 
 		// вибір певного варіанту та перевірка його на правильність
-		for i := 0; i < 4; i++ {
+		for i := 0; i < 6; i++ {
 			bs := page.MustWaitStable().MustElements("input[value='" + strconv.Itoa(i) + "']");
 			for _, b := range bs {
+				var nq, nans int
+
+				fmt.Sscanf(b.MustProperty("name").String(), "question-%d", &nq)
+				fmt.Sscanf(b.MustProperty("value").String(), "%d",  &nans)
+				curPathway.Questions[nq].Options = append(curPathway.Questions[nq].Options, Option{})
+				curOption := &curPathway.Questions[nq].Options[len(curPathway.Questions[nq].Options)-1]
+				ot := page.MustElement("label[for=\"" + b.MustProperty("id").String() + "\"]")
+				curOption.OptionTitle = ot.MustProperty("innerHTML").String()
+
 				b.MustClick()
 			}
 			page.MustElement("button.button-primary").MustClick()
@@ -59,21 +100,16 @@ func main() {
 				var nq, nans int
 				fmt.Sscanf(cb.MustProperty("name").String(), "question-%d", &nq)
 				fmt.Sscanf(cb.MustProperty("value").String(), "%d",  &nans)
-				a[nq][nans] = true
+				curOption := &curPathway.Questions[nq].Options[nans]
+				curOption.Correctness = true
 			}
 			page.MustElement("button.button").MustClick()
-		}
-
-		// виведення правильних відповідей
-		for i := 0; i < 10; i++ {
-			fmt.Printf("%2d:\n", i+1)
-			for j := 0; j < 4; j++ {
-				fmt.Printf("  - %t\n", a[i][j])
-			}
 		}
 
 		page.Close()
 	}
 
-	time.Sleep(time.Hour)
+	data, _ := json.Marshal(testData)
+	dataOutput := string(data)
+	fmt.Fprintf(file, dataOutput)
 }
