@@ -12,29 +12,29 @@ import (
 )
 
 type TestData struct {
-	Units []Unit `json: "units"`
+	Units []Unit `json:"units"`
 }
 
 type Unit struct {
-	UnitName string `json: "unitName"`
-	Pathways []Pathway `json: "pathways"` 
+	UnitName string `json:"unitName"`
+	Pathways []Pathway `json:"pathways"` 
 }
 
 type Pathway struct {
-	PathwayName string `json: "pathwayName"` 
-	Questions []Question `json: "questions"` 
+	PathwayName string `json:"pathwayName"` 
+	Questions []Question `json:"questions"` 
 }
 
 type Question struct {
-	QuestionTitle string `json: "questionTitle"` 
-	QuestionSubTitle string `json: "questionSubTitle"` 
-	QuestionType string `json: "questionType"` 
-	Options []Option `json: "options"` 
+	QuestionTitle string `json:"questionTitle"` 
+	QuestionSubTitle string `json:"questionSubTitle"` 
+	QuestionType string `json:"questionType"` 
+	Options []Option `json:"options"` 
 }
 
 type Option struct {
-	OptionTitle string `json: "optionTitle"` 
-	Correctness bool `json: "correctness"`
+	OptionTitle string `json:"optionTitle"` 
+	Correctness bool `json:"correctness"`
 }
 
 func main() {
@@ -74,7 +74,8 @@ func main() {
 			curQuestion.QuestionTitle = q.MustElement("h2").MustText()
 			rawSubTitle := q.MustElements("p")
 			for _, st := range rawSubTitle {
-				curQuestion.QuestionSubTitle = st.MustText()
+				curQuestion.QuestionSubTitle = st.MustProperty("innerHTML").String()
+
 			}
 			curQuestion.QuestionType = *q.MustAttribute("data-type")
 		}
