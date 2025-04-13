@@ -79,13 +79,13 @@ func main() {
 			}
 			curQuestion.QuestionType = *q.MustAttribute("data-type")
 
-			if QuestionTitle == "Fill-in-the-blanks" {
+			if curQuestion.QuestionTitle == "Fill-in-the-blanks" {
 				curQuestion.Options = append(curQuestion.Options, Option{})
-				if QuestionSubTitle == "\u003cspan\u003e\n      To handle conflicts when inserting into a database, you can pass a(n) \u003c/span\u003e\u003cinput type=\"text\" name=\"question-6\" class=\"devsite-quiz-text-input\" placeholder=\"Fill in the blank...\"\u003e\u003cspan\u003e parameter, such as IGNORE, to the @Insert annotation.\n    \u003c/span\u003e" {
+				if curQuestion.QuestionSubTitle == "\u003cspan\u003e\n      To handle conflicts when inserting into a database, you can pass a(n) \u003c/span\u003e\u003cinput type=\"text\" name=\"question-6\" class=\"devsite-quiz-text-input\" placeholder=\"Fill in the blank...\"\u003e\u003cspan\u003e parameter, such as IGNORE, to the @Insert annotation.\n    \u003c/span\u003e" {
 					curQuestion.Options[0].OptionTitle = "onConflict"
 					curQuestion.Options[0].Correctness = true
 				}
-				if QuestionSubTitle == "\n      The ___ thread is responsible for displaying the user interface responding to user input.\n    " {
+				if curQuestion.QuestionSubTitle == "\n      The ___ thread is responsible for displaying the user interface responding to user input.\n    " {
 					curQuestion.Options[0].OptionTitle = "Main"
 					curQuestion.Options[0].Correctness = true
 				}
