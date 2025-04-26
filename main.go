@@ -16,12 +16,12 @@ type TestData struct {
 }
 
 type Unit struct {
-	UnitName string `json:"number"`
+	UnitName int `json:"number"`
 	Pathways []Pathway `json:"pathways"` 
 }
 
 type Pathway struct {
-	PathwayName string `json:"number"` 
+	PathwayName int `json:"number"` 
 	Questions []Question `json:"questions"` 
 }
 
@@ -57,10 +57,10 @@ func main() {
 		fmt.Sscanf(pathwayLink, "https://developer.android.com/courses/pathways/android-basics-compose-unit-%d-pathway-%d", &unitNum, &pathwayNum)
 		testData.Units = append(testData.Units, Unit{})
 		curUnit := &testData.Units[len(testData.Units)-1]
-		curUnit.UnitName = "Unit-" + fmt.Sprint(unitNum)
+		curUnit.UnitName = unitNum
 		curUnit.Pathways = append(curUnit.Pathways, Pathway{})
 		curPathway := &curUnit.Pathways[len(curUnit.Pathways)-1]
-		curPathway.PathwayName = "Pathway-" + fmt.Sprint(pathwayNum)
+		curPathway.PathwayName = pathwayNum
 
 		page := browser.MustPage(pathwayLink)
 		page.MustElement("div.devsite-playlist--item--actions:nth-child(3) > a:nth-child(1)").MustClick()
