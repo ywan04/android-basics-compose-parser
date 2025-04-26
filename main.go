@@ -16,24 +16,24 @@ type TestData struct {
 }
 
 type Unit struct {
-	UnitName string `json:"unitName"`
+	UnitName string `json:"number"`
 	Pathways []Pathway `json:"pathways"` 
 }
 
 type Pathway struct {
-	PathwayName string `json:"pathwayName"` 
+	PathwayName string `json:"number"` 
 	Questions []Question `json:"questions"` 
 }
 
 type Question struct {
-	QuestionTitle string `json:"questionTitle"` 
-	QuestionSubTitle string `json:"questionSubTitle"` 
-	QuestionType string `json:"questionType"` 
+	QuestionTitle string `json:"title"` 
+	QuestionSubTitle string `json:"subTitle"` 
+	QuestionType string `json:"type"` 
 	Options []Option `json:"options"` 
 }
 
 type Option struct {
-	OptionTitle string `json:"optionTitle"` 
+	OptionTitle string `json:"title"` 
 	Correctness bool `json:"correctness"`
 }
 
